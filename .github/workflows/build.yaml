@@ -13,6 +13,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.72
+          target: wasm32-unknown-unknown
+          override: true
+          components: clippy
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: wasm-pack
+          version: 0.12.1
+          use-tool-cache: true
       - run: npm install
       - run: npm run lint
       - run: npm run test
