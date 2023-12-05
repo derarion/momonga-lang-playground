@@ -11,7 +11,9 @@
     "build": "tsc && vite build",
     "test": "npm run test:core",
     "test:core": "cd momonga && cargo test",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "npm run lint:web && npm run lint:core",
+    "lint:core": "cd momonga && cargo clippy -- -D warnings",
+    "lint:web": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "prepare": "simple-git-hooks"
   },
