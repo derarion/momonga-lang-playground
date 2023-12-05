@@ -19,22 +19,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@v1 # TODO: Not maintained. Consider using an alternative.
         with:
           toolchain: 1.72
           target: wasm32-unknown-unknown
           override: true
           components: clippy
-      - uses: actions-rs/install@v0.1
+      - uses: actions-rs/install@v0.1 # TODO: Not maintained. Consider using an alternative.
         with:
           crate: wasm-pack
           version: 0.12.1
-          use-tool-cache: true
+
       - run: npm install
       - run: npm run lint
       - run: npm run test
       - run: npm run build
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: build-artifact
           path: ./dist
@@ -47,12 +47,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: build-artifact
           path: ./dist
       - uses: actions/upload-pages-artifact@v2
         with:
           path: ./dist
-      - uses: actions/deploy-pages@v2
+      - uses: actions/deploy-pages@v3
         id: deployment
