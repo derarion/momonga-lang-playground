@@ -1,0 +1,58 @@
+name: cicd
+
+on: push
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.72
+          target: wasm32-unknown-unknown
+          override: true
+          components: clippy
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: wasm-pack
+          version: 0.12.1
+          use-tool-cache: true
+      - run: npm install
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact
+          path: ./dist
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-artifact
+          path: ./dist
+      - uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./dist
+      - uses: actions/deploy-pages@v2
+        id: deployment
