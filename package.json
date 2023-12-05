@@ -8,7 +8,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run build:core && npm run build:web",
+    "build:core": "cd ./momonga && wasm-pack build --release --target web",
+    "build:web": "tsc && vite build",
     "test": "npm run test:core",
     "test:core": "cd momonga && cargo test",
     "lint": "npm run lint:web && npm run lint:core",

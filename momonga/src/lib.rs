@@ -1,5 +1,17 @@
+use wasm_bindgen::prelude::*;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
+}
+
+#[wasm_bindgen]
+extern {
+    pub fn alert(s: &str);
+}
+
+#[wasm_bindgen]
+pub fn greet(name: &str) {
+    alert(&format!("Hello, {}!", name));
 }
 
 #[cfg(test)]

@@ -5,9 +5,9 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react-hooks/recommended",
-    "prettier"
+    "prettier",
   ],
-  ignorePatterns: ["dist", ".eslintrc.cjs"],
+  ignorePatterns: ["dist", ".eslintrc.cjs", "momonga/"],
   parser: "@typescript-eslint/parser",
   plugins: ["react-refresh"],
   rules: {
