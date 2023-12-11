@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { Box } from "@mui/material";
 
 import init, { greet } from "../momonga/pkg/momonga";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
 
 function App() {
   useEffect(() => {
@@ -20,9 +22,7 @@ function App() {
         margin: "0 auto",
       }}
     >
-      <Box component="header" sx={{ backgroundColor: "lightyellow" }}>
-        header
-      </Box>
+      <Header />
       <Box
         component="main"
         sx={{
@@ -39,9 +39,7 @@ function App() {
           greet
         </button>
       </Box>
-      <Box component="footer" sx={{ backgroundColor: "lightyellow" }}>
-        footer
-      </Box>
+      <Footer />
     </Box>
   );
 }
