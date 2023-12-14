@@ -7,6 +7,10 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 
 function App() {
+  const handleRunClick = () => {
+    greet("WebAssembly");
+  };
+
   useEffect(() => {
     init();
   }, []);
@@ -22,7 +26,7 @@ function App() {
         margin: "0 auto",
       }}
     >
-      <Header />
+      <Header onRunClick={handleRunClick} />
       <Box
         component="main"
         sx={{
@@ -30,15 +34,7 @@ function App() {
           overflow: "hidden",
           backgroundColor: "lightblue",
         }}
-      >
-        <button
-          onClick={() => {
-            greet("WebAssembly");
-          }}
-        >
-          greet
-        </button>
-      </Box>
+      ></Box>
       <Footer />
     </Box>
   );

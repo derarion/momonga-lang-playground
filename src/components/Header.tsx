@@ -13,7 +13,11 @@ import { IoMdDocument } from "react-icons/io";
 import { MdDarkMode } from "react-icons/md";
 import { VscLayoutPanelOff } from "react-icons/vsc";
 
-export const Header = () => {
+type Props = {
+  onRunClick: () => void;
+};
+
+export const Header = ({ onRunClick }: Props) => {
   return (
     <AppBar position="static" sx={{ padding: "0.5rem" }}>
       <Toolbar variant="dense">
@@ -26,7 +30,9 @@ export const Header = () => {
             gap: "1rem",
           }}
         >
-          <Button variant="contained">Run</Button>
+          <Button onClick={onRunClick} variant="contained">
+            Run
+          </Button>
           <FormControl>
             <InputLabel id="code-snippets-select-label">
               Code Snippets
