@@ -1,3 +1,5 @@
+import { useContext } from "react";
+
 import {
   AppBar,
   Box,
@@ -13,11 +15,15 @@ import { IoMdDocument } from "react-icons/io";
 import { MdDarkMode } from "react-icons/md";
 import { VscLayoutPanelOff } from "react-icons/vsc";
 
+import { ThemeContext } from "@/context/ThemeContext";
+import { ThemeConfig } from "@/types/types";
+
 type Props = {
   onRunClick: () => void;
 };
 
 export const Header = ({ onRunClick }: Props) => {
+  const { toggleThemeMode } = useContext<ThemeConfig>(ThemeContext);
   return (
     <AppBar position="static" sx={{ padding: "0.5rem" }}>
       <Toolbar variant="dense">
@@ -66,7 +72,7 @@ export const Header = ({ onRunClick }: Props) => {
           <IconButton>
             <VscLayoutPanelOff />
           </IconButton>
-          <IconButton>
+          <IconButton onClick={toggleThemeMode}>
             <MdDarkMode />
           </IconButton>
         </Box>
