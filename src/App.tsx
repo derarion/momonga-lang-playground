@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Box } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 
 import { Editor } from "@/components/Editor";
 import { Footer } from "@/components/Footer";
@@ -44,8 +44,14 @@ function App() {
           backgroundColor: "lightblue",
         }}
       >
-        <Output stdout={stdout} stderr={stderr} />
-        <Editor srcRef={srcRef} />
+        <Grid container direction="column" spacing={0} sx={{ height: "100%" }}>
+          <Grid item xs={8}>
+            <Editor srcRef={srcRef} />
+          </Grid>
+          <Grid item xs={4}>
+            <Output stdout={stdout} stderr={stderr} />
+          </Grid>
+        </Grid>
       </Box>
       <Footer />
     </Box>
