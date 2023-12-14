@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Box } from "@mui/material";
 
+import { Editor } from "@/components/Editor";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Output } from "@/components/Output";
@@ -9,6 +10,7 @@ import { Stderr, Stdout } from "@/types/types";
 import init, { greet } from "../momonga/pkg/momonga";
 
 function App() {
+  const srcRef = useRef<string>("Hello, World!");
   const [stdout, setStdout] = useState<Stdout>([]);
   const [stderr, setStderr] = useState<Stderr>([]);
 
@@ -43,6 +45,7 @@ function App() {
         }}
       >
         <Output stdout={stdout} stderr={stderr} />
+        <Editor srcRef={srcRef} />
       </Box>
       <Footer />
     </Box>
