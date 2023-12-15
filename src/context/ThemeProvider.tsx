@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 
 import { PaletteMode } from "@mui/material";
 import { amber } from "@mui/material/colors";
@@ -15,7 +15,11 @@ type Props = {
 };
 
 export const ThemeProvider = ({ children }: Props) => {
-  const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    const themeMode = localStorage.getItem("themeMode");
+    return themeMode === "dark" || themeMode === "light" ? themeMode : "dark";
+  });
+
   const themeConfig: ThemeConfig = {
     themeMode,
     toggleThemeMode: () => {
@@ -45,6 +49,10 @@ export const ThemeProvider = ({ children }: Props) => {
       }),
     [muiMode],
   );
+
+  useEffect(() => {
+    localStorage.setItem("themeMode", themeMode);
+  }, [themeMode]);
 
   return (
     <ThemeContext.Provider value={themeConfig}>
