@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 import { useIsDarkMode } from "@/hooks/useIsDarkMode";
+import { MonacoTheme } from "@/types/types";
 
 monaco.languages.register({ id: "momonga" });
 monaco.languages.setLanguageConfiguration("momonga", {
@@ -105,7 +106,9 @@ export const Editor = React.memo(({ srcRef }: Props) => {
 
   const isDarkMode = useIsDarkMode();
 
-  const monacoTheme = isDarkMode ? "monaco-theme-dark" : "monaco-theme-light";
+  const monacoTheme: MonacoTheme = isDarkMode
+    ? "monaco-theme-dark"
+    : "monaco-theme-light";
 
   useEffect(
     () => {

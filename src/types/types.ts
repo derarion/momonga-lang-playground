@@ -6,3 +6,5 @@ export type ThemeConfig = {
   themeMode: ThemeMode;
   toggleThemeMode: () => void;
 };
+
+export type MonacoTheme = "monaco-theme-dark" | "monaco-theme-light";
