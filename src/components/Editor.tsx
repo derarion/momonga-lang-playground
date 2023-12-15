@@ -1,16 +1,9 @@
-import React, {
-  MutableRefObject,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 
 import { Box } from "@mui/material";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
-import { ThemeContext } from "@/context/ThemeContext";
-import { ThemeConfig } from "@/types/types";
+import { useIsDarkMode } from "@/hooks/useIsDarkMode";
 
 monaco.languages.register({ id: "momonga" });
 monaco.languages.setLanguageConfiguration("momonga", {
@@ -110,9 +103,9 @@ export const Editor = React.memo(({ srcRef }: Props) => {
     useState<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoEl = useRef<HTMLElement>(null);
 
-  const { themeMode } = useContext<ThemeConfig>(ThemeContext);
-  const monacoTheme =
-    themeMode === "light" ? "monaco-theme-light" : "monaco-theme-dark";
+  const isDarkMode = useIsDarkMode();
+
+  const monacoTheme = isDarkMode ? "monaco-theme-dark" : "monaco-theme-light";
 
   useEffect(
     () => {
