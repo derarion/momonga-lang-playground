@@ -13,16 +13,22 @@ import {
 } from "@mui/material";
 import { IoMdDocument } from "react-icons/io";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
-import { VscLayoutPanelOff } from "react-icons/vsc";
+import { VscLayoutPanelOff, VscLayoutSidebarRightOff } from "react-icons/vsc";
 
 import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeConfig } from "@/types/types";
 
 type Props = {
+  isMainLayoutHorizontal: boolean;
+  onMainLayoutClick: () => void;
   onRunClick: () => void;
 };
 
-export const Header = ({ onRunClick }: Props) => {
+export const Header = ({
+  isMainLayoutHorizontal,
+  onMainLayoutClick,
+  onRunClick,
+}: Props) => {
   const { themeMode, toggleThemeMode } = useContext<ThemeConfig>(ThemeContext);
   return (
     <AppBar position="static" sx={{ padding: "0.5rem" }}>
@@ -69,8 +75,12 @@ export const Header = ({ onRunClick }: Props) => {
           >
             Grammar
           </Button>
-          <IconButton>
-            <VscLayoutPanelOff />
+          <IconButton onClick={onMainLayoutClick}>
+            {isMainLayoutHorizontal ? (
+              <VscLayoutPanelOff />
+            ) : (
+              <VscLayoutSidebarRightOff />
+            )}
           </IconButton>
           <IconButton onClick={toggleThemeMode}>
             {themeMode === "light" ? <MdLightMode /> : <MdDarkMode />}

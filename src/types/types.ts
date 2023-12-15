@@ -6,5 +6,6 @@ export type ThemeConfig = {
   themeMode: ThemeMode;
   toggleThemeMode: () => void;
 };
+export type MainLayout = "horizontal" | "vertical";
 
 export type MonacoTheme = "monaco-theme-dark" | "monaco-theme-light";
