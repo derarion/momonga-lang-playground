@@ -9,7 +9,14 @@ type Props = {
 
 export const Output = ({ stdout, stderr }: Props) => {
   return (
-    <Box>
+    <Box
+      sx={{
+        height: "100%",
+        width: "100%",
+        overflow: "auto",
+        padding: 1,
+      }}
+    >
       <Box>
         <Divider>Standard Output</Divider>
         <Box>

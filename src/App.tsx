@@ -40,15 +40,28 @@ function App() {
         component="main"
         sx={{
           height: "100%",
+          width: "100%",
           overflow: "hidden",
-          backgroundColor: "lightblue",
         }}
       >
-        <Grid container direction="column" spacing={0} sx={{ height: "100%" }}>
+        <Grid
+          container
+          direction="column"
+          spacing={0}
+          sx={{ height: "100%", width: "100%" }}
+        >
           <Grid item xs={8}>
             <Editor srcRef={srcRef} />
           </Grid>
-          <Grid item xs={4}>
+          <Grid
+            item
+            xs={4}
+            sx={{
+              height: "100%",
+              width: "100%",
+              overflow: "auto",
+            }}
+          >
             <Output stdout={stdout} stderr={stderr} />
           </Grid>
         </Grid>
