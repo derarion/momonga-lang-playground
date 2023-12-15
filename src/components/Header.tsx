@@ -12,7 +12,7 @@ import {
   Toolbar,
 } from "@mui/material";
 import { IoMdDocument } from "react-icons/io";
-import { MdDarkMode } from "react-icons/md";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { VscLayoutPanelOff } from "react-icons/vsc";
 
 import { ThemeContext } from "@/context/ThemeContext";
@@ -23,7 +23,7 @@ type Props = {
 };
 
 export const Header = ({ onRunClick }: Props) => {
-  const { toggleThemeMode } = useContext<ThemeConfig>(ThemeContext);
+  const { themeMode, toggleThemeMode } = useContext<ThemeConfig>(ThemeContext);
   return (
     <AppBar position="static" sx={{ padding: "0.5rem" }}>
       <Toolbar variant="dense">
@@ -73,7 +73,7 @@ export const Header = ({ onRunClick }: Props) => {
             <VscLayoutPanelOff />
           </IconButton>
           <IconButton onClick={toggleThemeMode}>
-            <MdDarkMode />
+            {themeMode === "light" ? <MdLightMode /> : <MdDarkMode />}
           </IconButton>
         </Box>
       </Toolbar>
