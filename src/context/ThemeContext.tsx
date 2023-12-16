@@ -1,8 +1,8 @@
 import { createContext } from "react";
 
-import { ThemeConfig } from "@/types/types";
+import { UserConfig } from "@/types/types";
 
-export const ThemeContext = createContext<ThemeConfig>({
-  themeMode: "dark",
-  toggleThemeMode: () => {},
+export const ThemeContext = createContext<UserConfig>({
+  mode: "dark",
+  toggleMode: () => {},
 });

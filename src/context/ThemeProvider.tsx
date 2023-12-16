@@ -8,25 +8,25 @@ import {
 } from "@mui/material/styles";
 
 import { ThemeContext } from "@/context/ThemeContext";
-import { ThemeConfig, ThemeMode } from "@/types/types";
+import { UserConfig, UserMode } from "@/types/types";
 
 type Props = {
   children: ReactNode;
 };
 
 export const ThemeProvider = ({ children }: Props) => {
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    const themeMode = localStorage.getItem("themeMode");
-    return themeMode === "dark" || themeMode === "light" ? themeMode : "dark";
+  const [mode, setMode] = useState<UserMode>(() => {
+    const l = localStorage.getItem("mode");
+    return l === "dark" || l === "light" ? l : "dark";
   });
 
-  const themeConfig: ThemeConfig = {
-    themeMode,
-    toggleThemeMode: () => {
-      setThemeMode((prev) => (prev === "dark" ? "light" : "dark"));
+  const userConfig: UserConfig = {
+    mode,
+    toggleMode: () => {
+      setMode((prev) => (prev === "dark" ? "light" : "dark"));
     },
   };
-  const muiMode: PaletteMode = themeMode === "light" ? "light" : "dark";
+  const muiMode: PaletteMode = mode === "light" ? "light" : "dark";
   const muiTheme = useMemo(
     () =>
       createTheme({
@@ -51,11 +51,11 @@ export const ThemeProvider = ({ children }: Props) => {
   );
 
   useEffect(() => {
-    localStorage.setItem("themeMode", themeMode);
-  }, [themeMode]);
+    localStorage.setItem("mode", mode);
+  }, [mode]);
 
   return (
-    <ThemeContext.Provider value={themeConfig}>
+    <ThemeContext.Provider value={userConfig}>
       <MuiThemeProvider theme={muiTheme}>{children}</MuiThemeProvider>
     </ThemeContext.Provider>
   );

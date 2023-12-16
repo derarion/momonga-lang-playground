@@ -16,22 +16,22 @@ import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { VscLayoutPanelOff, VscLayoutSidebarRightOff } from "react-icons/vsc";
 
 import { ThemeContext } from "@/context/ThemeContext";
-import { ThemeConfig } from "@/types/types";
+import { UserConfig } from "@/types/types";
 
 type Props = {
   isMuiMdScreen: boolean;
-  isLayoutHorizontal: boolean;
+  isHorizontalLayout: boolean;
   onMainLayoutClick: () => void;
   onRunClick: () => void;
 };
 
 export const Header = ({
   isMuiMdScreen,
-  isLayoutHorizontal,
+  isHorizontalLayout,
   onMainLayoutClick,
   onRunClick,
 }: Props) => {
-  const { themeMode, toggleThemeMode } = useContext<ThemeConfig>(ThemeContext);
+  const { mode, toggleMode } = useContext<UserConfig>(ThemeContext);
   return (
     <AppBar position="static" sx={{ padding: "0.5rem" }}>
       <Toolbar variant="dense">
@@ -79,15 +79,15 @@ export const Header = ({
           </Button>
           {!isMuiMdScreen && (
             <IconButton onClick={onMainLayoutClick}>
-              {isLayoutHorizontal ? (
+              {isHorizontalLayout ? (
                 <VscLayoutPanelOff />
               ) : (
                 <VscLayoutSidebarRightOff />
               )}
             </IconButton>
           )}
-          <IconButton onClick={toggleThemeMode}>
-            {themeMode === "light" ? <MdLightMode /> : <MdDarkMode />}
+          <IconButton onClick={toggleMode}>
+            {mode === "light" ? <MdLightMode /> : <MdDarkMode />}
           </IconButton>
         </Box>
       </Toolbar>

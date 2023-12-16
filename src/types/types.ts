@@ -1,11 +1,11 @@
 export type Stdout = string[];
 export type Stderr = string[];
 
-export type ThemeMode = "dark" | "light";
-export type ThemeConfig = {
-  themeMode: ThemeMode;
-  toggleThemeMode: () => void;
+export type UserMode = "dark" | "light";
+export type UserConfig = {
+  mode: UserMode;
+  toggleMode: () => void;
 };
-export type MainLayout = "horizontal" | "vertical";
 
+export type Layout = "horizontal" | "vertical";
 export type MonacoTheme = "monaco-theme-dark" | "monaco-theme-light";

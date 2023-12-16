@@ -6,7 +6,7 @@ import { Editor } from "@/components/Editor";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Output } from "@/components/Output";
-import { MainLayout, Stderr, Stdout } from "@/types/types";
+import { Layout, Stderr, Stdout } from "@/types/types";
 import init, { greet } from "../momonga/pkg/momonga";
 
 function App() {
@@ -14,14 +14,14 @@ function App() {
   const [stdout, setStdout] = useState<Stdout>([]);
   const [stderr, setStderr] = useState<Stderr>([]);
 
-  const [userLayout, setUserLayout] = useState<MainLayout>(() => {
+  const [userLayout, setUserLayout] = useState<Layout>(() => {
     const l = localStorage.getItem("userLayout");
     return l === "horizontal" || l === "vertical" ? l : "horizontal";
   });
   const isMuiMdScreen = useMediaQuery<boolean>(
     useTheme().breakpoints.down("md"),
   );
-  const isLayoutHorizontal = userLayout === "horizontal" || isMuiMdScreen;
+  const isHorizontalLayout = userLayout === "horizontal" || isMuiMdScreen;
 
   const handleRunClick = () => {
     greet("WebAssembly");
@@ -53,7 +53,7 @@ function App() {
     >
       <Header
         isMuiMdScreen={isMuiMdScreen}
-        isLayoutHorizontal={isLayoutHorizontal}
+        isHorizontalLayout={isHorizontalLayout}
         onRunClick={handleRunClick}
         onMainLayoutClick={handleLayoutClick}
       />
@@ -67,7 +67,7 @@ function App() {
       >
         <Grid
           container
-          direction={isLayoutHorizontal ? "column" : "row"}
+          direction={isHorizontalLayout ? "column" : "row"}
           spacing={0}
           sx={{ height: "100%", width: "100%" }}
         >
@@ -75,7 +75,7 @@ function App() {
             item
             xs={8}
             sx={{
-              height: isLayoutHorizontal ? "calc(100% * 2 /3)" : "100%",
+              height: isHorizontalLayout ? "calc(100% * 2 /3)" : "100%",
               width: "100%",
             }}
           >
@@ -85,7 +85,7 @@ function App() {
             item
             xs={4}
             sx={{
-              height: isLayoutHorizontal ? "calc(100% * 2 /3)" : "100%",
+              height: isHorizontalLayout ? "calc(100% * 2 /3)" : "100%",
               width: "100%",
               overflow: "auto",
             }}
