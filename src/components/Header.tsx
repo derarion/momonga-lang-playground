@@ -33,7 +33,11 @@ export const Header = ({
 }: Props) => {
   const { mode, toggleMode } = useContext<UserConfig>(ThemeContext);
   return (
-    <AppBar position="static" sx={{ padding: "0.5rem" }} color="default">
+    <AppBar
+      position="static"
+      sx={{ padding: "0.5rem", boxShadow: "none" }}
+      color="default"
+    >
       <Toolbar variant="dense">
         <Box
           sx={{

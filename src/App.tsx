@@ -49,6 +49,7 @@ function App() {
         width: "92%",
         maxWidth: "1280px",
         margin: "0 auto",
+        boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
       }}
     >
       <Header
