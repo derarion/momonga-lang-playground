@@ -36,13 +36,19 @@ export const ThemeProvider = ({ children }: Props) => {
             ? {
                 primary: amber,
                 text: {
-                  primary: "#fff",
+                  primary: "#D4D4D4",
+                },
+                background: {
+                  default: "#1E1E1E",
                 },
               }
             : {
                 primary: amber,
                 text: {
-                  primary: "#000",
+                  primary: "#000000",
+                },
+                background: {
+                  default: "#FFFFFF",
                 },
               }),
         },
