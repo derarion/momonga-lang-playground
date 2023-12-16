@@ -19,13 +19,15 @@ import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeConfig } from "@/types/types";
 
 type Props = {
-  isMainLayoutHorizontal: boolean;
+  isMuiMdScreen: boolean;
+  isLayoutHorizontal: boolean;
   onMainLayoutClick: () => void;
   onRunClick: () => void;
 };
 
 export const Header = ({
-  isMainLayoutHorizontal,
+  isMuiMdScreen,
+  isLayoutHorizontal,
   onMainLayoutClick,
   onRunClick,
 }: Props) => {
@@ -75,13 +77,15 @@ export const Header = ({
           >
             Grammar
           </Button>
-          <IconButton onClick={onMainLayoutClick}>
-            {isMainLayoutHorizontal ? (
-              <VscLayoutPanelOff />
-            ) : (
-              <VscLayoutSidebarRightOff />
-            )}
-          </IconButton>
+          {!isMuiMdScreen && (
+            <IconButton onClick={onMainLayoutClick}>
+              {isLayoutHorizontal ? (
+                <VscLayoutPanelOff />
+              ) : (
+                <VscLayoutSidebarRightOff />
+              )}
+            </IconButton>
+          )}
           <IconButton onClick={toggleThemeMode}>
             {themeMode === "light" ? <MdLightMode /> : <MdDarkMode />}
           </IconButton>

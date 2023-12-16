@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
 
 import { Editor } from "@/components/Editor";
 import { Footer } from "@/components/Footer";
@@ -14,11 +14,14 @@ function App() {
   const [stdout, setStdout] = useState<Stdout>([]);
   const [stderr, setStderr] = useState<Stderr>([]);
 
-  const [mainLayout, setMainLayout] = useState<MainLayout>(() => {
-    const l = localStorage.getItem("mainLayout");
+  const [userLayout, setUserLayout] = useState<MainLayout>(() => {
+    const l = localStorage.getItem("userLayout");
     return l === "horizontal" || l === "vertical" ? l : "horizontal";
   });
-  const isMainLayoutHorizontal = mainLayout === "horizontal";
+  const isMuiMdScreen = useMediaQuery<boolean>(
+    useTheme().breakpoints.down("md"),
+  );
+  const isLayoutHorizontal = userLayout === "horizontal" || isMuiMdScreen;
 
   const handleRunClick = () => {
     greet("WebAssembly");
@@ -27,15 +30,15 @@ function App() {
   };
 
   const handleLayoutClick = () => {
-    setMainLayout((prev) =>
+    setUserLayout((prev) =>
       prev === "horizontal" ? "vertical" : "horizontal",
     );
   };
 
   useEffect(() => {
     init();
-    localStorage.setItem("mainLayout", mainLayout);
-  }, [mainLayout]);
+    localStorage.setItem("userLayout", userLayout);
+  }, [userLayout]);
 
   return (
     <Box
@@ -49,7 +52,8 @@ function App() {
       }}
     >
       <Header
-        isMainLayoutHorizontal={isMainLayoutHorizontal}
+        isMuiMdScreen={isMuiMdScreen}
+        isLayoutHorizontal={isLayoutHorizontal}
         onRunClick={handleRunClick}
         onMainLayoutClick={handleLayoutClick}
       />
@@ -63,7 +67,7 @@ function App() {
       >
         <Grid
           container
-          direction={isMainLayoutHorizontal ? "column" : "row"}
+          direction={isLayoutHorizontal ? "column" : "row"}
           spacing={0}
           sx={{ height: "100%", width: "100%" }}
         >
@@ -71,7 +75,7 @@ function App() {
             item
             xs={8}
             sx={{
-              height: isMainLayoutHorizontal ? "calc(100% * 2 /3)" : "100%",
+              height: isLayoutHorizontal ? "calc(100% * 2 /3)" : "100%",
               width: "100%",
             }}
           >
@@ -81,7 +85,7 @@ function App() {
             item
             xs={4}
             sx={{
-              height: isMainLayoutHorizontal ? "calc(100% * 2 /3)" : "100%",
+              height: isLayoutHorizontal ? "calc(100% * 2 /3)" : "100%",
               width: "100%",
               overflow: "auto",
             }}
