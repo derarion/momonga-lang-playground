@@ -1,0 +1,66 @@
+program    = { SOI ~ wc* ~ stmt* ~ EOI }
+
+stmt       = { block_stmt | func_decl | if_stmt | for_stmt | var_stmt | expr_stmt | continue_stmt | break_stmt | return_stmt }
+
+block_stmt = { "{" ~ wc* ~ stmt* ~ "}" ~ wc* }
+
+func_decl = { "func" ~ wc+ ~ IDENT ~ wc* ~ "(" ~ wc* ~ IDENT? ~ wc* ~ ("," ~ wc* ~ IDENT ~ wc*)* ~ ")" ~ wc* ~ block_stmt ~ wc* }
+
+if_stmt             = { "if" ~ wc* ~ "(" ~ wc* ~ expr ~ ")" ~ wc* ~ block_stmt ~ if_stmt_else_clause? }
+if_stmt_else_clause = { ("else" ~ wc* ~ block_stmt | "else" ~ wc+ ~ if_stmt) }
+
+for_stmt              = { "for" ~ wc* ~ "(" ~ wc* ~ for_stmt_init? ~ ";" ~ wc* ~ for_stmt_cond? ~ ";" ~ wc* ~ for_stmt_afterthought? ~ ")" ~ wc* ~ block_stmt }
+for_stmt_init         = { ("var" ~ wc+ ~ IDENT ~ wc* ~ "=" ~ wc*)? ~ expr }
+for_stmt_cond         = { expr }
+for_stmt_afterthought = { expr }
+
+var_stmt = { "var" ~ wc+ ~ IDENT ~ wc* ~ ("=" ~ wc* ~ expr)? ~ ";" ~ wc* }
+
+expr_stmt = _{ expr ~ ";" ~ wc* }
+
+continue_stmt = { "continue" ~ wc* ~ ";" ~ wc* }
+
+break_stmt = { "break" ~ wc* ~ ";" ~ wc* }
+
+return_stmt = { ("return" ~ ((wc+ ~ expr) | wc*) ~ ";" ~ wc*) }
+
+expr    =  { atom ~ (infix ~ atom)* }
+primary = _{ "(" ~ wc* ~ expr ~ ")" ~ wc* | literal | IDENT ~ wc* }
+atom    = _{ prefix* ~ primary ~ postfix* }
+
+prefix = _{ (POS | NEG | NOT) ~ wc* }
+POS    =  { "+" }
+NEG    =  { "-" }
+NOT    =  { "!" }
+
+infix    = _{ (ADD | SUBTRACT | MULTIPLY | DIVIDE | MODULO | EQ | NOT_EQ | LE | LT | GE | GT | AND | OR | ASSIGN) ~ wc* }
+ADD      =  { "+" }
+SUBTRACT =  { "-" }
+MULTIPLY =  { "*" }
+DIVIDE   =  { "/" }
+MODULO   =  { "%" }
+EQ       =  { "==" }
+NOT_EQ   =  { "!=" }
+GT       =  { ">" }
+GE       =  { ">=" }
+LT       =  { "<" }
+LE       =  { "<=" }
+AND      =  { "&&" }
+OR       =  { "||" }
+ASSIGN   =  { "=" }
+
+postfix = _{ INDEX | CALL }
+INDEX = { "[" ~ wc* ~ expr ~ "]" ~ wc* }
+CALL  = { "(" ~ wc* ~ ")" | "(" ~ wc* ~ expr ~ ("," ~ wc* ~ expr)* ~ ")" ~ wc* }
+
+literal = { (BOOL_LITERAL | INT_LITERAL | "\"" ~ STRING_LITERAL ~ "\"" | ARRAY_LITERAL | NONE_LITERAL) ~ wc* }
+IDENT          = { !("func" | "return" | "if" | "else" | "for" | "var" | "true" | "false" | "break" | "continue" | "none") ~ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+BOOL_LITERAL   = { "true" | "false" }
+INT_LITERAL    = { "0" | (ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*) }
+STRING_LITERAL = { (!("\"" | "\\") ~ ANY | "\\" ~ (ANY | "\""))* }
+ARRAY_LITERAL  = { "[" ~ wc* ~ (expr ~ ("," ~ wc* ~ expr)* ~ ("," ~ wc*)?)? ~ "]" }
+NONE_LITERAL = { "none" }
+
+wc = _{ w | c }
+w = _{ " " | NEWLINE }
+c = _{ ("/*" ~ (!"*/" ~ ANY)* ~ "*/") | ("//" ~ (!(NEWLINE | EOI) ~ ANY)* ~ (NEWLINE | EOI)) }
