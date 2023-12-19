@@ -97,9 +97,10 @@ monaco.editor.defineTheme("monaco-theme-dark", {
 
 type Props = {
   srcRef: MutableRefObject<string>;
+  onSrcChange: (src: string) => void;
 };
 
-export const Editor = React.memo(({ srcRef }: Props) => {
+export const Editor = React.memo(({ srcRef, onSrcChange }: Props) => {
   const [editor, setEditor] =
     useState<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoEl = useRef<HTMLElement>(null);
@@ -127,6 +128,10 @@ export const Editor = React.memo(({ srcRef }: Props) => {
         lineNumbers: "on",
         automaticLayout: true,
         fontSize: 16,
+      });
+
+      editor.onDidChangeModelContent(() => {
+        onSrcChange(editor.getValue());
       });
 
       setEditor(editor);
