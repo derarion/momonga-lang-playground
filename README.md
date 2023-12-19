@@ -203,7 +203,11 @@ This is intended to make learners aware of the necessity of defining a variable 
 ```JavaScript
 var x = 1;
 
-var x; // `none` is assigned
+// Reassignment
+x = 2;
+
+// Redeclaration
+var x; // Without initialization, `none` is assigned
 
 ```
 
