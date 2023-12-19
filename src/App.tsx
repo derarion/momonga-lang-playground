@@ -7,10 +7,10 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Output } from "@/components/Output";
 import { Layout, Stderr, Stdout } from "@/types/types";
-import init, { greet } from "../momonga/pkg/momonga";
+import init, { momonga_run } from "../momonga/pkg/momonga";
 
 function App() {
-  const srcRef = useRef<string>("Hello, World!");
+  const srcRef = useRef<string>('print("Hello, World!");');
   const [stdout, setStdout] = useState<Stdout>([]);
   const [stderr, setStderr] = useState<Stderr>([]);
 
@@ -24,9 +24,13 @@ function App() {
   const isHorizontalLayout = userLayout === "horizontal" || isMuiMdScreen;
 
   const handleRunClick = () => {
-    greet("WebAssembly");
-    setStdout(["stdout sample", "stdout sample"]);
-    setStderr(["stderr sample", "stderr sample"]);
+    setStdout([]);
+    setStderr([]);
+    momonga_run(srcRef.current);
+  };
+
+  const handleSrcChange = (src: string) => {
+    srcRef.current = src;
   };
 
   const handleLayoutClick = () => {
@@ -37,7 +41,24 @@ function App() {
 
   useEffect(() => {
     init();
+
+    const handlePrintStdoutEvent = (ev: Event) => {
+      const event = ev as CustomEvent;
+      setStdout((prev) => [...prev, event.detail]);
+    };
+    const handlePrintstderrEvent = (ev: Event) => {
+      const event = ev as CustomEvent;
+      setStderr((prev) => [...prev, event.detail]);
+    };
+    window.addEventListener("printstderr", handlePrintstderrEvent);
+    window.addEventListener("printstdout", handlePrintStdoutEvent);
+
     localStorage.setItem("userLayout", userLayout);
+
+    return () => {
+      window.removeEventListener("printstdout", handlePrintStdoutEvent);
+      window.removeEventListener("printstderr", handlePrintstderrEvent);
+    };
   }, [userLayout]);
 
   return (
@@ -79,7 +100,7 @@ function App() {
               width: "100%",
             }}
           >
-            <Editor srcRef={srcRef} />
+            <Editor srcRef={srcRef} onSrcChange={handleSrcChange} />
           </Grid>
           <Grid
             item
