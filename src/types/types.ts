@@ -9,3 +9,20 @@ export type UserConfig = {
 
 export type Layout = "horizontal" | "vertical";
 export type MonacoTheme = "monaco-theme-dark" | "monaco-theme-light";
+
+export type Snippet = {
+  key: SnippetKey;
+  label: string;
+  code: string;
+};
+export type SnippetKey =
+  | "helloWorld"
+  | "arithmeticOperation"
+  | "variableDeclaration"
+  | "array"
+  | "functionDeclarationAndCall"
+  | "ifStatement"
+  | "forStatement"
+  | "blockScope"
+  | "lexicalScoping"
+  | "recursiveFunction";
