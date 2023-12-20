@@ -1023,6 +1023,22 @@ fn variable_is_daclared_and_assigned_value_correctly() {
             "#,
             Some("1".to_string()),
         ),
+        (
+            r#"
+            var x = 1;
+            var x = 2; // Redeclaration
+            x;
+            "#,
+            Some("2".to_string()),
+        ),
+        (
+            r#"
+            var x = 1;
+            x = 2; // Reassignment
+            x;
+            "#,
+            Some("2".to_string()),
+        ),
         // Name error
         (
             r#"
