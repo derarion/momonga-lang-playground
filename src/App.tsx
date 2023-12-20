@@ -1,18 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Grid,
+  SelectChangeEvent,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 
 import { Editor } from "@/components/Editor";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Output } from "@/components/Output";
-import { Layout, Stderr, Stdout } from "@/types/types";
+import { snippets } from "@/constants";
+import { Layout, SnippetKey, Stderr, Stdout } from "@/types/types";
 import init, { momonga_run } from "../momonga/pkg/momonga";
 
 function App() {
-  const srcRef = useRef<string>('print("Hello, World!");');
+  const srcRef = useRef<string>("");
   const [stdout, setStdout] = useState<Stdout>([]);
   const [stderr, setStderr] = useState<Stderr>([]);
+  const [snippetKey, setSnippetKey] = useState<SnippetKey>(snippets[0].key);
 
   const [userLayout, setUserLayout] = useState<Layout>(() => {
     const l = localStorage.getItem("userLayout");
@@ -37,6 +45,15 @@ function App() {
     setUserLayout((prev) =>
       prev === "horizontal" ? "vertical" : "horizontal",
     );
+  };
+
+  const handleSnippetChange = (event: SelectChangeEvent<string>) => {
+    const snippet = snippets.find(
+      (snippet) => snippet.key === event.target.value,
+    );
+    if (snippet) {
+      setSnippetKey(snippet.key);
+    }
   };
 
   useEffect(() => {
@@ -70,12 +87,15 @@ function App() {
         width: "92%",
         maxWidth: "1280px",
         margin: "0 auto",
+        boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
       }}
     >
       <Header
         isMuiMdScreen={isMuiMdScreen}
         isHorizontalLayout={isHorizontalLayout}
+        snippetKey={snippetKey}
         onRunClick={handleRunClick}
+        onSnippetChange={handleSnippetChange}
         onMainLayoutClick={handleLayoutClick}
       />
       <Box
@@ -100,7 +120,11 @@ function App() {
               width: "100%",
             }}
           >
-            <Editor srcRef={srcRef} onSrcChange={handleSrcChange} />
+            <Editor
+              srcRef={srcRef}
+              snippetKey={snippetKey}
+              onSrcChange={handleSrcChange}
+            />
           </Grid>
           <Grid
             item
