@@ -3,8 +3,9 @@ import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
+import { snippets } from "@/constants";
 import { useIsDarkMode } from "@/hooks/useIsDarkMode";
-import { MonacoTheme } from "@/types/types";
+import { MonacoTheme, SnippetKey } from "@/types/types";
 
 monaco.languages.register({ id: "momonga" });
 monaco.languages.setLanguageConfiguration("momonga", {
@@ -97,56 +98,65 @@ monaco.editor.defineTheme("monaco-theme-dark", {
 
 type Props = {
   srcRef: MutableRefObject<string>;
+  snippetKey: SnippetKey;
   onSrcChange: (src: string) => void;
 };
 
-export const Editor = React.memo(({ srcRef, onSrcChange }: Props) => {
-  const [editor, setEditor] =
-    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const monacoEl = useRef<HTMLElement>(null);
+export const Editor = React.memo(
+  ({ srcRef, snippetKey, onSrcChange }: Props) => {
+    const [editor, setEditor] =
+      useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+    const monacoEl = useRef<HTMLElement>(null);
 
-  const isDarkMode = useIsDarkMode();
+    const isDarkMode = useIsDarkMode();
 
-  const monacoTheme: MonacoTheme = isDarkMode
-    ? "monaco-theme-dark"
-    : "monaco-theme-light";
+    const monacoTheme: MonacoTheme = isDarkMode
+      ? "monaco-theme-dark"
+      : "monaco-theme-light";
 
-  useEffect(
-    () => {
-      const editor = monaco.editor.create(monacoEl.current!, {
-        value: srcRef.current,
-        language: "momonga",
-        theme: monacoTheme,
-        autoIndent: "brackets",
-        autoClosingBrackets: "always",
-        autoClosingQuotes: "always",
-        bracketPairColorization: {
-          enabled: true,
-          independentColorPoolPerBracketType: true,
-        },
-        minimap: { enabled: false },
-        lineNumbers: "on",
-        automaticLayout: true,
-        fontSize: 16,
-      });
+    useEffect(
+      () => {
+        const editor = monaco.editor.create(monacoEl.current!, {
+          value: srcRef.current,
+          language: "momonga",
+          theme: monacoTheme,
+          autoIndent: "brackets",
+          autoClosingBrackets: "always",
+          autoClosingQuotes: "always",
+          bracketPairColorization: {
+            enabled: true,
+            independentColorPoolPerBracketType: true,
+          },
+          minimap: { enabled: false },
+          lineNumbers: "on",
+          automaticLayout: true,
+          fontSize: 16,
+        });
 
-      editor.onDidChangeModelContent(() => {
-        onSrcChange(editor.getValue());
-      });
+        editor.onDidChangeModelContent(() => {
+          onSrcChange(editor.getValue());
+        });
 
-      setEditor(editor);
+        setEditor(editor);
 
-      return () => editor.dispose();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+        return () => editor.dispose();
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [],
+    );
 
-  useEffect(() => {
-    if (editor) {
-      monaco.editor.setTheme(monacoTheme);
-    }
-  }, [editor, monacoTheme]);
+    useEffect(() => {
+      if (editor) {
+        editor.setValue(snippets.find((s) => s.key === snippetKey)?.code || "");
+      }
+    }, [editor, snippetKey]);
 
-  return <Box ref={monacoEl} sx={{ height: "100%" }}></Box>;
-});
+    useEffect(() => {
+      if (editor) {
+        monaco.editor.setTheme(monacoTheme);
+      }
+    }, [editor, monacoTheme]);
+
+    return <Box ref={monacoEl} sx={{ height: "100%" }}></Box>;
+  },
+);

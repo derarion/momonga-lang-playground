@@ -9,27 +9,33 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Toolbar,
 } from "@mui/material";
 import { IoMdDocument } from "react-icons/io";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { VscLayoutPanelOff, VscLayoutSidebarRightOff } from "react-icons/vsc";
 
+import { snippets } from "@/constants";
 import { ThemeContext } from "@/context/ThemeContext";
-import { UserConfig } from "@/types/types";
+import { SnippetKey, UserConfig } from "@/types/types";
 
 type Props = {
   isMuiMdScreen: boolean;
   isHorizontalLayout: boolean;
-  onMainLayoutClick: () => void;
+  snippetKey: SnippetKey;
   onRunClick: () => void;
+  onSnippetChange: (event: SelectChangeEvent) => void;
+  onMainLayoutClick: () => void;
 };
 
 export const Header = ({
   isMuiMdScreen,
   isHorizontalLayout,
+  snippetKey,
   onMainLayoutClick,
   onRunClick,
+  onSnippetChange,
 }: Props) => {
   const { mode, toggleMode } = useContext<UserConfig>(ThemeContext);
   return (
@@ -59,10 +65,15 @@ export const Header = ({
               labelId="code-snippets-select-label"
               id="code-snippets-select"
               label="Code Snippets"
+              value={snippetKey}
+              onChange={onSnippetChange}
+              autoWidth
             >
-              <MenuItem>Item1</MenuItem>
-              <MenuItem>Item2</MenuItem>
-              <MenuItem>Item3</MenuItem>
+              {snippets.map((snippet) => (
+                <MenuItem key={snippet.key} value={snippet.key}>
+                  {snippet.label}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
