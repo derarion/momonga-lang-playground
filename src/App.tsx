@@ -34,7 +34,7 @@ function App() {
   const handleRunClick = () => {
     setStdout([]);
     setStderr([]);
-    momonga_run(srcRef.current);
+    momonga_run(srcRef.current); // NOTE: In order to run on Worker, it is necessary to change the way of passing its output data to main thread.
   };
 
   const handleSrcChange = (src: string) => {
