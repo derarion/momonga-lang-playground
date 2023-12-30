@@ -48,6 +48,9 @@ pub fn emit_print_event(print_event: PrintEvent, data: &str) {
 
 #[wasm_bindgen]
 pub fn momonga_run(source: &str) {
+    #[cfg(debug_assertions)]
+    console_error_panic_hook::set_once();
+    
     match parse(source) {
         Ok(ast) => match eval(&ast, Rc::new(RefCell::new(Env::new_with_builtins()))) {
             Ok(_) => (),
