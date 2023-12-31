@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
+import { MutableRefObject, memo, useEffect, useRef, useState } from "react";
 
 import { Box } from "@mui/material";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
@@ -103,7 +103,7 @@ type Props = {
   onSrcChange: (src: string) => void;
 };
 
-export const Editor = React.memo(
+export const Editor = memo(
   ({ isParseError, srcRef, snippetKey, onSrcChange }: Props) => {
     const [editor, setEditor] =
       useState<monaco.editor.IStandaloneCodeEditor | null>(null);

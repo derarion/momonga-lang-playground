@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   Box,
@@ -37,33 +37,36 @@ function App() {
   );
   const isHorizontalLayout = userLayout === "horizontal" || isMuiMdScreen;
 
-  const handleRunClick = () => {
+  const handleRunClick = useCallback(() => {
     setStdout([]);
     setStderr([]);
     momonga_run(srcRef.current); // NOTE: In order to run on Worker, it is necessary to change the way of passing its output data to main thread.
-  };
+  }, []);
 
-  const handleSrcChange = (src: string) => {
+  const handleSrcChange = useCallback((src: string) => {
     srcRef.current = src;
 
     if (!isWasmIntitializedRef.current) return;
     setIsParseError(is_momonga_parse_error(src));
-  };
+  }, []);
 
-  const handleLayoutClick = () => {
+  const handleLayoutClick = useCallback(() => {
     setUserLayout((prev) =>
       prev === "horizontal" ? "vertical" : "horizontal",
     );
-  };
+  }, []);
 
-  const handleSnippetChange = (event: SelectChangeEvent<string>) => {
-    const snippet = snippets.find(
-      (snippet) => snippet.key === event.target.value,
-    );
-    if (snippet) {
-      setSnippetKey(snippet.key);
-    }
-  };
+  const handleSnippetChange = useCallback(
+    (event: SelectChangeEvent<string>) => {
+      const snippet = snippets.find(
+        (snippet) => snippet.key === event.target.value,
+      );
+      if (snippet) {
+        setSnippetKey(snippet.key);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     (async () => {
