@@ -20,7 +20,7 @@ import init, {
 } from "../momonga/pkg/momonga";
 
 function App() {
-  const isWasmIntitializedRef = useRef<boolean>(false);
+  const isWasmInitializedRef = useRef<boolean>(false);
 
   const srcRef = useRef<string>("");
   const [isParseError, setIsParseError] = useState<boolean>(false);
@@ -46,7 +46,7 @@ function App() {
   const handleSrcChange = useCallback((src: string) => {
     srcRef.current = src;
 
-    if (!isWasmIntitializedRef.current) return;
+    if (!isWasmInitializedRef.current) return;
     setIsParseError(is_momonga_parse_error(src));
   }, []);
 
@@ -71,7 +71,7 @@ function App() {
   useEffect(() => {
     (async () => {
       await init();
-      isWasmIntitializedRef.current = true;
+      isWasmInitializedRef.current = true;
     })();
 
     const handleStdoutEvent = (ev: Event) => {
