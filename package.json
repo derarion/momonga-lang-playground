@@ -7,7 +7,7 @@
     "node": "18.x"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "cd ./momonga && wasm-pack build --dev --target web && cd ../ && vite",
     "build": "npm run build:core && npm run build:web",
     "build:core": "cd ./momonga && wasm-pack build --release --target web",
     "build:web": "tsc && vite build",
@@ -16,7 +16,7 @@
     "lint": "npm run lint:web && npm run lint:core",
     "lint:core": "cd momonga && cargo clippy -- -D warnings",
     "lint:web": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
+    "preview": "npm run build && vite preview",
     "prepare": "simple-git-hooks"
   },
   "simple-git-hooks": {

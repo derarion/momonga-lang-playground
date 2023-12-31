@@ -3,7 +3,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use crate::env::Store;
 use crate::error::EvalError;
-use crate::{emit_print_event, PrintEvent};
+use crate::{emit_output_event, OutputEvent};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Value<'a> {
@@ -100,6 +100,6 @@ pub fn momonga_pop(args: BuiltinArgs) -> BuiltinReturn {
 }
 
 pub fn momonga_print(args: BuiltinArgs) -> BuiltinReturn {
-    emit_print_event(PrintEvent::Stdout, &(*args[0].borrow()).to_string());
+    emit_output_event(OutputEvent::Stdout, &(*args[0].borrow()).to_string());
     Ok(Rc::new(RefCell::new(Value::None)))
 }
