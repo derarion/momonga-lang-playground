@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import { Box, Divider } from "@mui/material";
 
 import { Stderr, Stdout } from "@/types/types";
@@ -7,7 +9,7 @@ type Props = {
   stderr: Stderr;
 };
 
-export const Output = ({ stdout, stderr }: Props) => {
+export const Output = memo(({ stdout, stderr }: Props) => {
   return (
     <Box
       sx={{
@@ -31,4 +33,4 @@ export const Output = ({ stdout, stderr }: Props) => {
       </Box>
     </Box>
   );
-};
+});

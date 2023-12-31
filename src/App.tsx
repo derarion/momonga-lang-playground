@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   Box,
@@ -14,10 +14,16 @@ import { Header } from "@/components/Header";
 import { Output } from "@/components/Output";
 import { snippets } from "@/constants";
 import { Layout, SnippetKey, Stderr, Stdout } from "@/types/types";
-import init, { momonga_run } from "../momonga/pkg/momonga";
+import init, {
+  is_momonga_parse_error,
+  momonga_run,
+} from "../momonga/pkg/momonga";
 
 function App() {
+  const isWasmInitializedRef = useRef<boolean>(false);
+
   const srcRef = useRef<string>("");
+  const [isParseError, setIsParseError] = useState<boolean>(false);
   const [stdout, setStdout] = useState<Stdout>([]);
   const [stderr, setStderr] = useState<Stderr>([]);
   const [snippetKey, setSnippetKey] = useState<SnippetKey>(snippets[0].key);
@@ -31,51 +37,62 @@ function App() {
   );
   const isHorizontalLayout = userLayout === "horizontal" || isMuiMdScreen;
 
-  const handleRunClick = () => {
+  const handleRunClick = useCallback(() => {
     setStdout([]);
     setStderr([]);
-    momonga_run(srcRef.current);
-  };
+    momonga_run(srcRef.current); // NOTE: In order to run on Worker, it is necessary to change the way of passing its output data to main thread.
+  }, []);
 
-  const handleSrcChange = (src: string) => {
+  const handleSrcChange = useCallback((src: string) => {
     srcRef.current = src;
-  };
 
-  const handleLayoutClick = () => {
+    if (!isWasmInitializedRef.current) return;
+    setIsParseError(is_momonga_parse_error(src));
+  }, []);
+
+  const handleLayoutClick = useCallback(() => {
     setUserLayout((prev) =>
       prev === "horizontal" ? "vertical" : "horizontal",
     );
-  };
+  }, []);
 
-  const handleSnippetChange = (event: SelectChangeEvent<string>) => {
-    const snippet = snippets.find(
-      (snippet) => snippet.key === event.target.value,
-    );
-    if (snippet) {
-      setSnippetKey(snippet.key);
-    }
-  };
+  const handleSnippetChange = useCallback(
+    (event: SelectChangeEvent<string>) => {
+      const snippet = snippets.find(
+        (snippet) => snippet.key === event.target.value,
+      );
+      if (snippet) {
+        setSnippetKey(snippet.key);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
-    init();
+    (async () => {
+      await init();
+      isWasmInitializedRef.current = true;
+    })();
 
-    const handlePrintStdoutEvent = (ev: Event) => {
+    const handleStdoutEvent = (ev: Event) => {
       const event = ev as CustomEvent;
       setStdout((prev) => [...prev, event.detail]);
     };
-    const handlePrintstderrEvent = (ev: Event) => {
+    const handleStderrEvent = (ev: Event) => {
       const event = ev as CustomEvent;
       setStderr((prev) => [...prev, event.detail]);
     };
-    window.addEventListener("printstderr", handlePrintstderrEvent);
-    window.addEventListener("printstdout", handlePrintStdoutEvent);
-
-    localStorage.setItem("userLayout", userLayout);
+    window.addEventListener("stderr", handleStderrEvent);
+    window.addEventListener("stdout", handleStdoutEvent);
 
     return () => {
-      window.removeEventListener("printstdout", handlePrintStdoutEvent);
-      window.removeEventListener("printstderr", handlePrintstderrEvent);
+      window.removeEventListener("stdout", handleStdoutEvent);
+      window.removeEventListener("stderr", handleStderrEvent);
     };
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("userLayout", userLayout);
   }, [userLayout]);
 
   return (
@@ -121,6 +138,7 @@ function App() {
             }}
           >
             <Editor
+              isParseError={isParseError}
               srcRef={srcRef}
               snippetKey={snippetKey}
               onSrcChange={handleSrcChange}

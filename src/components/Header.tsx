@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { memo, useContext } from "react";
 
 import {
   AppBar,
@@ -29,83 +29,85 @@ type Props = {
   onMainLayoutClick: () => void;
 };
 
-export const Header = ({
-  isMuiMdScreen,
-  isHorizontalLayout,
-  snippetKey,
-  onMainLayoutClick,
-  onRunClick,
-  onSnippetChange,
-}: Props) => {
-  const { mode, toggleMode } = useContext<UserConfig>(ThemeContext);
-  return (
-    <AppBar
-      position="static"
-      sx={{ padding: "0.5rem", boxShadow: "none" }}
-      color="default"
-    >
-      <Toolbar variant="dense">
-        <Box
-          sx={{
-            marginRight: "auto",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "1rem",
-          }}
-        >
-          <Button onClick={onRunClick} variant="contained">
-            Run
-          </Button>
-          <FormControl>
-            <InputLabel id="code-snippets-select-label">
-              Code Snippets
-            </InputLabel>
-            <Select
-              labelId="code-snippets-select-label"
-              id="code-snippets-select"
-              label="Code Snippets"
-              value={snippetKey}
-              onChange={onSnippetChange}
-              autoWidth
-            >
-              {snippets.map((snippet) => (
-                <MenuItem key={snippet.key} value={snippet.key}>
-                  {snippet.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-        <Box
-          sx={{
-            marginLeft: "auto",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Button
-            startIcon={<IoMdDocument />}
-            color="inherit"
-            sx={{ borderRight: 0 }}
+export const Header = memo(
+  ({
+    isMuiMdScreen,
+    isHorizontalLayout,
+    snippetKey,
+    onMainLayoutClick,
+    onRunClick,
+    onSnippetChange,
+  }: Props) => {
+    const { mode, toggleMode } = useContext<UserConfig>(ThemeContext);
+    return (
+      <AppBar
+        position="static"
+        sx={{ padding: "0.5rem", boxShadow: "none" }}
+        color="default"
+      >
+        <Toolbar variant="dense">
+          <Box
+            sx={{
+              marginRight: "auto",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "1rem",
+            }}
           >
-            Grammar
-          </Button>
-          {!isMuiMdScreen && (
-            <IconButton onClick={onMainLayoutClick}>
-              {isHorizontalLayout ? (
-                <VscLayoutPanelOff />
-              ) : (
-                <VscLayoutSidebarRightOff />
-              )}
+            <Button onClick={onRunClick} variant="contained">
+              Run
+            </Button>
+            <FormControl>
+              <InputLabel id="code-snippets-select-label">
+                Code Snippets
+              </InputLabel>
+              <Select
+                labelId="code-snippets-select-label"
+                id="code-snippets-select"
+                label="Code Snippets"
+                value={snippetKey}
+                onChange={onSnippetChange}
+                autoWidth
+              >
+                {snippets.map((snippet) => (
+                  <MenuItem key={snippet.key} value={snippet.key}>
+                    {snippet.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          <Box
+            sx={{
+              marginLeft: "auto",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              startIcon={<IoMdDocument />}
+              color="inherit"
+              sx={{ borderRight: 0 }}
+            >
+              Grammar
+            </Button>
+            {!isMuiMdScreen && (
+              <IconButton onClick={onMainLayoutClick}>
+                {isHorizontalLayout ? (
+                  <VscLayoutPanelOff />
+                ) : (
+                  <VscLayoutSidebarRightOff />
+                )}
+              </IconButton>
+            )}
+            <IconButton onClick={toggleMode}>
+              {mode === "light" ? <MdLightMode /> : <MdDarkMode />}
             </IconButton>
-          )}
-          <IconButton onClick={toggleMode}>
-            {mode === "light" ? <MdLightMode /> : <MdDarkMode />}
-          </IconButton>
-        </Box>
-      </Toolbar>
-    </AppBar>
-  );
-};
+          </Box>
+        </Toolbar>
+      </AppBar>
+    );
+  },
+);

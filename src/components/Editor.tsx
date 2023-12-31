@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
+import { MutableRefObject, memo, useEffect, useRef, useState } from "react";
 
 import { Box } from "@mui/material";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
@@ -97,13 +97,14 @@ monaco.editor.defineTheme("monaco-theme-dark", {
 });
 
 type Props = {
+  isParseError: boolean;
   srcRef: MutableRefObject<string>;
   snippetKey: SnippetKey;
   onSrcChange: (src: string) => void;
 };
 
-export const Editor = React.memo(
-  ({ srcRef, snippetKey, onSrcChange }: Props) => {
+export const Editor = memo(
+  ({ isParseError, srcRef, snippetKey, onSrcChange }: Props) => {
     const [editor, setEditor] =
       useState<monaco.editor.IStandaloneCodeEditor | null>(null);
     const monacoEl = useRef<HTMLElement>(null);
@@ -157,6 +158,14 @@ export const Editor = React.memo(
       }
     }, [editor, monacoTheme]);
 
-    return <Box ref={monacoEl} sx={{ height: "100%" }}></Box>;
+    return (
+      <Box
+        ref={monacoEl}
+        sx={{
+          height: "100%",
+          border: isParseError ? "2px solid #FF0000" : "2px solid transparent",
+        }}
+      ></Box>
+    );
   },
 );
