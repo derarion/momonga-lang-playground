@@ -70,12 +70,14 @@ function App() {
     window.addEventListener("printstderr", handlePrintstderrEvent);
     window.addEventListener("printstdout", handlePrintStdoutEvent);
 
-    localStorage.setItem("userLayout", userLayout);
-
     return () => {
       window.removeEventListener("printstdout", handlePrintStdoutEvent);
       window.removeEventListener("printstderr", handlePrintstderrEvent);
     };
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("userLayout", userLayout);
   }, [userLayout]);
 
   return (
