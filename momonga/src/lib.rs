@@ -24,17 +24,17 @@ pub fn interpret(src: &str) -> Option<String> {
 }
 
 #[wasm_bindgen]
-pub enum PrintEvent {
+pub enum OutputEvent {
     Stdout,
     Stderr,
 }
 
 #[wasm_bindgen]
-pub fn emit_print_event(print_event: PrintEvent, data: &str) {
+pub fn emit_output_event(output_event: OutputEvent, data: &str) {
     let window = web_sys::window().unwrap();
-    let type_ = match print_event {
-        PrintEvent::Stdout => "printstdout",
-        PrintEvent::Stderr => "printstderr",
+    let type_ = match output_event {
+        OutputEvent::Stdout => "stdout",
+        OutputEvent::Stderr => "stderr",
     };
     let event = CustomEvent::new(type_).unwrap();
     event.init_custom_event_with_can_bubble_and_cancelable_and_detail(
@@ -54,8 +54,8 @@ pub fn momonga_run(source: &str) {
     match parse(source) {
         Ok(ast) => match eval(&ast, Rc::new(RefCell::new(Env::new_with_builtins()))) {
             Ok(_) => (),
-            Err(eval_err) => emit_print_event(PrintEvent::Stderr, &eval_err.to_string()),
+            Err(eval_err) => emit_output_event(OutputEvent::Stderr, &eval_err.to_string()),
         },
-        Err(parse_err) => emit_print_event(PrintEvent::Stderr, &parse_err.to_string()),
+        Err(parse_err) => emit_output_event(OutputEvent::Stderr, &parse_err.to_string()),
     }
 }

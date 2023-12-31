@@ -59,20 +59,20 @@ function App() {
   useEffect(() => {
     init();
 
-    const handlePrintStdoutEvent = (ev: Event) => {
+    const handleStdoutEvent = (ev: Event) => {
       const event = ev as CustomEvent;
       setStdout((prev) => [...prev, event.detail]);
     };
-    const handlePrintstderrEvent = (ev: Event) => {
+    const handleStderrEvent = (ev: Event) => {
       const event = ev as CustomEvent;
       setStderr((prev) => [...prev, event.detail]);
     };
-    window.addEventListener("printstderr", handlePrintstderrEvent);
-    window.addEventListener("printstdout", handlePrintStdoutEvent);
+    window.addEventListener("stderr", handleStderrEvent);
+    window.addEventListener("stdout", handleStdoutEvent);
 
     return () => {
-      window.removeEventListener("printstdout", handlePrintStdoutEvent);
-      window.removeEventListener("printstderr", handlePrintstderrEvent);
+      window.removeEventListener("stdout", handleStdoutEvent);
+      window.removeEventListener("stderr", handleStderrEvent);
     };
   }, []);
 
