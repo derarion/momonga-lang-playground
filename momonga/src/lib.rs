@@ -59,3 +59,14 @@ pub fn momonga_run(source: &str) {
         Err(parse_err) => emit_output_event(OutputEvent::Stderr, &parse_err.to_string()),
     }
 }
+
+#[wasm_bindgen]
+pub fn is_momonga_parse_error(source: &str) -> bool {
+    #[cfg(debug_assertions)]
+    console_error_panic_hook::set_once();
+    
+    match parse(source) {
+        Ok(_ast) => false,
+        Err(_parse_err) => true,
+    }
+}

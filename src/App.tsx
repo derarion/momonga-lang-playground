@@ -14,10 +14,16 @@ import { Header } from "@/components/Header";
 import { Output } from "@/components/Output";
 import { snippets } from "@/constants";
 import { Layout, SnippetKey, Stderr, Stdout } from "@/types/types";
-import init, { momonga_run } from "../momonga/pkg/momonga";
+import init, {
+  is_momonga_parse_error,
+  momonga_run,
+} from "../momonga/pkg/momonga";
 
 function App() {
+  const isWasmIntitializedRef = useRef<boolean>(false);
+
   const srcRef = useRef<string>("");
+  const [isParseError, setIsParseError] = useState<boolean>(false);
   const [stdout, setStdout] = useState<Stdout>([]);
   const [stderr, setStderr] = useState<Stderr>([]);
   const [snippetKey, setSnippetKey] = useState<SnippetKey>(snippets[0].key);
@@ -39,6 +45,9 @@ function App() {
 
   const handleSrcChange = (src: string) => {
     srcRef.current = src;
+
+    if (!isWasmIntitializedRef.current) return;
+    setIsParseError(is_momonga_parse_error(src));
   };
 
   const handleLayoutClick = () => {
@@ -57,7 +66,10 @@ function App() {
   };
 
   useEffect(() => {
-    init();
+    (async () => {
+      await init();
+      isWasmIntitializedRef.current = true;
+    })();
 
     const handleStdoutEvent = (ev: Event) => {
       const event = ev as CustomEvent;
@@ -123,6 +135,7 @@ function App() {
             }}
           >
             <Editor
+              isParseError={isParseError}
               srcRef={srcRef}
               snippetKey={snippetKey}
               onSrcChange={handleSrcChange}
