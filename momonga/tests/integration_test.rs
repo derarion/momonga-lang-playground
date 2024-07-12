@@ -135,7 +135,7 @@ fn prefix_operator_is_interpreted_correctly() {
             r#"
             -9223372036854775808; // Min value of Integer type
         "#,
-            Some(std::i64::MIN.to_string()),
+            Some(i64::MIN.to_string()),
         ),
         (
             r#"
@@ -153,7 +153,7 @@ fn prefix_operator_is_interpreted_correctly() {
             r#"
             +-9223372036854775808;  // Attempt to apply + operator to the min of Integer type
         "#,
-            Some(std::i64::MIN.to_string()),
+            Some(i64::MIN.to_string()),
         ),
         (
             r#"
