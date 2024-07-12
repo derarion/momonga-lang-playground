@@ -125,17 +125,18 @@ fn eval_for_stmt<'a>(for_stmt: &'a ForStmt, env: Rc<RefCell<Env<'a>>>) -> EvalSt
         afterthought,
         block,
     } = for_stmt;
+    let env_block = Rc::new(RefCell::new(Env::new(Some(Rc::clone(&env)))));
 
     match init {
-        Some(ForStmtInit::Var(var_stmt)) => eval_var_stmt(var_stmt, Rc::clone(&env))?,
-        Some(ForStmtInit::Expr(expr_stmt)) => eval_expr_stmt(expr_stmt, Rc::clone(&env))?,
+        Some(ForStmtInit::Var(var_stmt)) => eval_var_stmt(var_stmt, Rc::clone(&env_block))?,
+        Some(ForStmtInit::Expr(expr_stmt)) => eval_expr_stmt(expr_stmt, env)?,
         _ => todo!(), // TODO: Define how to handle this case
     };
 
     let mut result = Ok(None);
     loop {
         let cond = match cond {
-            Some(cond) => match *eval_expr(cond, Rc::clone(&env))?.borrow() {
+            Some(cond) => match *eval_expr(cond, Rc::clone(&env_block))?.borrow() {
                 Value::Bool(bool) => bool,
                 _ => todo!(), // TODO: Define how to handle this case
             },
@@ -146,9 +147,9 @@ fn eval_for_stmt<'a>(for_stmt: &'a ForStmt, env: Rc<RefCell<Env<'a>>>) -> EvalSt
             break;
         }
 
-        result = match eval_block_stmt(block, Rc::clone(&env)) {
+        result = match eval_block_stmt(block, Rc::clone(&env_block)) {
             Err(JumpStmt::Continue) => {
-                eval_for_stmt_afterthought(afterthought, Rc::clone(&env))?;
+                eval_for_stmt_afterthought(afterthought, Rc::clone(&env_block))?;
                 result = Ok(None);
                 continue;
             }
@@ -158,7 +159,7 @@ fn eval_for_stmt<'a>(for_stmt: &'a ForStmt, env: Rc<RefCell<Env<'a>>>) -> EvalSt
             default => default,
         };
 
-        eval_for_stmt_afterthought(afterthought, Rc::clone(&env))?;
+        eval_for_stmt_afterthought(afterthought, Rc::clone(&env_block))?;
     }
     result
 }
