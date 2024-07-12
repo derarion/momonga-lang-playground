@@ -87,6 +87,7 @@ impl AstBuilder {
             Rule::func_decl => Ok(Stmt::FuncDecl(self.func_decl(unknown_pair)?)),
             Rule::if_stmt => Ok(Stmt::IfStmt(self.if_stmt(unknown_pair)?)),
             Rule::for_stmt => Ok(Stmt::ForStmt(self.for_stmt(unknown_pair)?)),
+            Rule::while_stmt => Ok(Stmt::WhileStmt(self.while_stmt(unknown_pair)?)),
             Rule::var_stmt => Ok(Stmt::VarStmt(self.var_stmt(unknown_pair)?)),
             Rule::expr => Ok(Stmt::ExprStmt(self.expr(unknown_pair)?)),
             Rule::continue_stmt => {
@@ -306,6 +307,16 @@ impl AstBuilder {
             self.flow = AstBuildFlow::Value;
         };
         Ok(block_stmt)
+    }
+
+    fn while_stmt(&mut self, while_stmt_pair: Pair<Rule>) -> Result<WhileStmt, ParseError> {
+        let mut while_stmt_inner = while_stmt_pair.into_inner();
+        let cond = while_stmt_inner.next().map(|p| self.expr(p)).unwrap()?;
+        let block = while_stmt_inner.next().map(|p| self.block_stmt(p)).unwrap()?;
+        Ok(WhileStmt {
+            cond,
+            block
+        })
     }
 
     fn var_stmt(&self, pair: Pair<Rule>) -> Result<VarStmt, ParseError> {
@@ -585,7 +596,12 @@ mod tests {
             "#,
                 Err(ParseError::PestParser),
             ),
-        ];
+            (
+                r#"
+            while(){}
+            "#,
+                Err(ParseError::PestParser),
+            ),        ];
 
         for (src, expected) in tests {
             assert_eq!(parse(src), expected, "Failed in test case: {}", src);
@@ -1136,6 +1152,41 @@ mod tests {
                 Err(ParseError::PestParser),
             ),
         ];
+
+        for (src, expected) in tests {
+            assert_eq!(parse(src), expected, "Failed in test case: {}", src);
+        }
+    }
+
+    #[test]
+    fn while_stmt_ast_is_built_correctly() {
+        let tests = [
+            (
+                r#"
+            while (true) {}
+            "#,
+                Ok(vec![
+                    Stmt::WhileStmt(WhileStmt {
+                        cond: Expr::literal_bool(true),
+                        block: vec![]
+                    })
+                ])
+            ),
+            (
+                r#"
+            while (true) {
+                42;
+            }
+            "#,
+                Ok(vec![
+                    Stmt::WhileStmt(WhileStmt {
+                        cond: Expr::literal_bool(true),
+                        block: vec![
+                            Stmt::ExprStmt(Expr::literal_int(42))
+                        ]
+                    })
+                ])
+            ),        ];
 
         for (src, expected) in tests {
             assert_eq!(parse(src), expected, "Failed in test case: {}", src);

@@ -17,7 +17,7 @@ pub enum JumpStmt<'a> {
     Error(EvalError),
 }
 
-const MAX_ABS_INT: u64 = std::i64::MIN.unsigned_abs(); // TODO: Reconsider how to handle value overflow
+const MAX_ABS_INT: u64 = i64::MIN.unsigned_abs(); // TODO: Reconsider how to handle value overflow
 
 pub fn eval<'a>(
     program: &'a Program,
@@ -40,6 +40,7 @@ fn eval_block_stmt<'a>(block_stmt: &'a BlockStmt, env: Rc<RefCell<Env<'a>>>) -> 
             Stmt::FuncDecl(func_decl) => eval_func_decl(func_decl, Rc::clone(&env_block)),
             Stmt::IfStmt(if_stmt) => eval_if_stmt(if_stmt, Rc::clone(&env_block)),
             Stmt::ForStmt(for_stmt) => eval_for_stmt(for_stmt, Rc::clone(&env_block)),
+            Stmt::WhileStmt(_while_stmt) => todo!(),
             Stmt::VarStmt(var_stmt) => eval_var_stmt(var_stmt, Rc::clone(&env_block)),
             Stmt::ExprStmt(expr_stmt) => eval_expr_stmt(expr_stmt, Rc::clone(&env_block)),
             Stmt::ContinueStmt => Err(JumpStmt::Continue),
@@ -213,12 +214,12 @@ fn eval_expr<'a>(expr: &'a Expr, env: Rc<RefCell<Env<'a>>>) -> EvalExprResult<'a
                 PrefixOpKind::Neg => {
                     if let Expr::Literal(Literal::Int(int)) = **rhs {
                         if int == MAX_ABS_INT {
-                            return Ok(Rc::new(RefCell::new(Value::Int(std::i64::MIN))));
+                            return Ok(Rc::new(RefCell::new(Value::Int(i64::MIN))));
                         };
                     };
                     match *eval_expr(rhs, env)?.borrow() {
                         Value::Int(int) => {
-                            if int == std::i64::MIN {
+                            if int == i64::MIN {
                                 return Err(JumpStmt::Error(EvalError::OutOfRange));
                                 // Attempt to nagate i64 min
                             }
