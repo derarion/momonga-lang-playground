@@ -31,24 +31,26 @@ pub fn eval<'a>(
 }
 
 fn eval_block_stmt<'a>(block_stmt: &'a BlockStmt, env: Rc<RefCell<Env<'a>>>) -> EvalStmtResult<'a> {
-    let env_block = Rc::new(RefCell::new(Env::new(Some(Rc::clone(&env)))));
     let mut result = Ok(None);
 
     for stmt in block_stmt {
         result = match stmt {
-            Stmt::BlockStmt(block_stmt) => eval_block_stmt(block_stmt, Rc::clone(&env_block)),
-            Stmt::FuncDecl(func_decl) => eval_func_decl(func_decl, Rc::clone(&env_block)),
-            Stmt::IfStmt(if_stmt) => eval_if_stmt(if_stmt, Rc::clone(&env_block)),
-            Stmt::ForStmt(for_stmt) => eval_for_stmt(for_stmt, Rc::clone(&env_block)),
+            Stmt::BlockStmt(block_stmt) => {
+                let env_block = Rc::new(RefCell::new(Env::new(Some(Rc::clone(&env)))));
+                eval_block_stmt(block_stmt, Rc::clone(&env_block))
+            },
+            Stmt::FuncDecl(func_decl) => eval_func_decl(func_decl, Rc::clone(&env)),
+            Stmt::IfStmt(if_stmt) => eval_if_stmt(if_stmt, Rc::clone(&env)),
+            Stmt::ForStmt(for_stmt) => eval_for_stmt(for_stmt, Rc::clone(&env)),
             Stmt::WhileStmt(_while_stmt) => todo!(),
-            Stmt::VarStmt(var_stmt) => eval_var_stmt(var_stmt, Rc::clone(&env_block)),
-            Stmt::ExprStmt(expr_stmt) => eval_expr_stmt(expr_stmt, Rc::clone(&env_block)),
+            Stmt::VarStmt(var_stmt) => eval_var_stmt(var_stmt, Rc::clone(&env)),
+            Stmt::ExprStmt(expr_stmt) => eval_expr_stmt(expr_stmt, Rc::clone(&env)),
             Stmt::ContinueStmt => Err(JumpStmt::Continue),
             Stmt::BreakStmt => Err(JumpStmt::Break),
             Stmt::ReturnStmt(return_stmt) => {
                 let ReturnStmt { expr } = return_stmt;
                 match expr {
-                    Some(expr) => Err(JumpStmt::Return(eval_expr(expr, Rc::clone(&env_block))?)),
+                    Some(expr) => Err(JumpStmt::Return(eval_expr(expr, Rc::clone(&env))?)),
                     None => Err(JumpStmt::Return(Rc::new(RefCell::new(Value::None)))),
                 }
             }
@@ -92,12 +94,14 @@ fn eval_if_stmt<'a>(if_stmt: &'a IfStmt, env: Rc<RefCell<Env<'a>>>) -> EvalStmtR
         else_clause,
     } = if_stmt;
 
+    let env_block = Rc::new(RefCell::new(Env::new(Some(Rc::clone(&env)))));
+
     match *eval_expr(condition, Rc::clone(&env))?.borrow() {
         Value::Bool(bool) => {
             if bool {
-                eval_block_stmt(block, env)
+                eval_block_stmt(block, env_block)
             } else if let Some(if_stmt_else_clause) = else_clause {
-                eval_if_stmt_else_clause(if_stmt_else_clause, env)
+                eval_if_stmt_else_clause(if_stmt_else_clause, env_block)
             } else {
                 Ok(None)
             }
