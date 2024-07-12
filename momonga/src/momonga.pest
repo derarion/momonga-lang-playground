@@ -1,6 +1,6 @@
 program    = { SOI ~ wc* ~ stmt* ~ EOI }
 
-stmt       = { block_stmt | func_decl | if_stmt | for_stmt | var_stmt | expr_stmt | continue_stmt | break_stmt | return_stmt }
+stmt       = { block_stmt | func_decl | if_stmt | for_stmt | while_stmt | var_stmt | expr_stmt | continue_stmt | break_stmt | return_stmt }
 
 block_stmt = { "{" ~ wc* ~ stmt* ~ "}" ~ wc* }
 
@@ -13,6 +13,9 @@ for_stmt              = { "for" ~ wc* ~ "(" ~ wc* ~ for_stmt_init? ~ ";" ~ wc* ~
 for_stmt_init         = { ("var" ~ wc+ ~ IDENT ~ wc* ~ "=" ~ wc*)? ~ expr }
 for_stmt_cond         = { expr }
 for_stmt_afterthought = { expr }
+
+while_stmt      = { "while" ~ wc* ~ "(" ~ wc* ~ while_stmt_cond ~ ")" ~ wc* ~ block_stmt }
+while_stmt_cond = { expr }
 
 var_stmt = { "var" ~ wc+ ~ IDENT ~ wc* ~ ("=" ~ wc* ~ expr)? ~ ";" ~ wc* }
 

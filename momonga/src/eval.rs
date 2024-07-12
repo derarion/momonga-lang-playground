@@ -40,6 +40,7 @@ fn eval_block_stmt<'a>(block_stmt: &'a BlockStmt, env: Rc<RefCell<Env<'a>>>) -> 
             Stmt::FuncDecl(func_decl) => eval_func_decl(func_decl, Rc::clone(&env_block)),
             Stmt::IfStmt(if_stmt) => eval_if_stmt(if_stmt, Rc::clone(&env_block)),
             Stmt::ForStmt(for_stmt) => eval_for_stmt(for_stmt, Rc::clone(&env_block)),
+            Stmt::WhileStmt(while_stmt) => todo!(),
             Stmt::VarStmt(var_stmt) => eval_var_stmt(var_stmt, Rc::clone(&env_block)),
             Stmt::ExprStmt(expr_stmt) => eval_expr_stmt(expr_stmt, Rc::clone(&env_block)),
             Stmt::ContinueStmt => Err(JumpStmt::Continue),
