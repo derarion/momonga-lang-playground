@@ -27,6 +27,11 @@ export const snippets: Snippet[] = [
     code: `for(var i = 0; i < 10; i = i + 1) {\n    if (i == 3) {\n        continue; // Move on to the next iteration\n    }\n\n    print(i);\n\n    if (i == 7) {\n        break;    // Break out of the loop\n    }\n}\n`,
   },
   {
+    key: "whileStatement",
+    label: "While Statement",
+    code: `var x = 0;\n\nwhile(x < 10) {\n    x = x + 1;\n    if (x == 3) {\n        continue; // Move on to the next iteration\n    }\n\n    if (x == 7) {\n        break;    // Break out of the loop\n    }\n\n    print(x);\n}\n`,
+  },
+  {
     key: "array",
     label: "Array",
     code: `var arr = [1, 2, 3];\n\n// Access elements\nprint(arr[0]); // First element\nprint(arr[len(arr) - 1]); // Last element\n\n// Manipulate elements\npush(arr, 4); // Add element to the last\nprint(arr);\n\npop(arr); // Remove the last element\npop(arr);\npop(arr);\npop(arr);\nprint(arr);\n`,
