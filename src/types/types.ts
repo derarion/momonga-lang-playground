@@ -23,6 +23,7 @@ export type SnippetKey =
   | "functionDeclarationAndCall"
   | "ifStatement"
   | "forStatement"
+  | "whileStatement"
   | "blockScope"
   | "lexicalScoping"
   | "recursiveFunction";
