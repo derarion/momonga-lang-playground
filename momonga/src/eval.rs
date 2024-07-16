@@ -42,7 +42,7 @@ fn eval_block_stmt<'a>(block_stmt: &'a BlockStmt, env: Rc<RefCell<Env<'a>>>) -> 
             Stmt::FuncDecl(func_decl) => eval_func_decl(func_decl, Rc::clone(&env)),
             Stmt::IfStmt(if_stmt) => eval_if_stmt(if_stmt, Rc::clone(&env)),
             Stmt::ForStmt(for_stmt) => eval_for_stmt(for_stmt, Rc::clone(&env)),
-            Stmt::WhileStmt(_while_stmt) => todo!(),
+            Stmt::WhileStmt(while_stmt) => eval_while_stmt(while_stmt, Rc::clone(&env)),
             Stmt::VarStmt(var_stmt) => eval_var_stmt(var_stmt, Rc::clone(&env)),
             Stmt::ExprStmt(expr_stmt) => eval_expr_stmt(expr_stmt, Rc::clone(&env)),
             Stmt::ContinueStmt => Err(JumpStmt::Continue),
@@ -158,7 +158,8 @@ fn eval_for_stmt<'a>(for_stmt: &'a ForStmt, env: Rc<RefCell<Env<'a>>>) -> EvalSt
                 continue;
             }
             Err(JumpStmt::Break) => {
-                return Ok(None);
+                result = Ok(None);
+                break;
             }
             default => default,
         };
@@ -176,6 +177,37 @@ fn eval_for_stmt_afterthought<'a>(
         eval_expr_stmt(for_stmt_afterthought, Rc::clone(&env))?;
     };
     Ok(None)
+}
+
+fn eval_while_stmt<'a>(while_stmt: &'a WhileStmt, env: Rc<RefCell<Env<'a>>>) -> EvalStmtResult<'a> {
+    let WhileStmt { cond, block } = while_stmt;
+
+    let mut result = Ok(None);
+    let env_block = Rc::new(RefCell::new(Env::new(Some(Rc::clone(&env)))));
+
+    loop {
+        let cond = match *eval_expr(cond, Rc::clone(&env_block))?.borrow() {
+            Value::Bool(bool) => bool,
+            _ => return Err(JumpStmt::Error(EvalError::Type)),
+        };
+
+        if !cond { break; }
+
+        result = match eval_block_stmt(block, Rc::clone(&env_block)) {
+            Err(JumpStmt::Continue) => {
+                result = Ok(None);
+                continue;
+            },
+            Err(JumpStmt::Break) => {
+                result = Ok(None);
+                break;
+            },
+            default => default,
+        }
+    }
+
+    result
+
 }
 
 fn eval_var_stmt<'a>(var_stmt: &'a VarStmt, env: Rc<RefCell<Env<'a>>>) -> EvalStmtResult<'a> {
@@ -683,6 +715,18 @@ mod tests {
                 Rc::new(RefCell::new(Env::new_with_builtins()))
             ),
             Ok(Some(Rc::new(RefCell::new(Value::Int(9)))))
+        );
+        // WhileStmt
+        assert_eq!(
+            eval(
+                // while(true) {break;}
+                &vec![Stmt::WhileStmt(WhileStmt {
+                    cond: Expr::literal_bool(true),
+                    block: vec![Stmt::BreakStmt]
+                })],
+                Rc::new(RefCell::new(Env::new_with_builtins()))
+            ),
+            Ok(None)
         );
         // VarStmt
         assert_eq!(

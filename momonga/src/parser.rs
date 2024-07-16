@@ -209,7 +209,7 @@ impl AstBuilder {
                             Rule::for_stmt_afterthought => {
                                 let afterthought = Some(self.expr(unknown_pair)?);
                                 let block =
-                                    self.block_stmt_of_for(for_stmt_inner.next().unwrap())?;
+                                    self.block_stmt_of_loop(for_stmt_inner.next().unwrap())?;
                                 Ok(ForStmt {
                                     init,
                                     cond,
@@ -221,14 +221,14 @@ impl AstBuilder {
                                 init,
                                 cond,
                                 afterthought: None,
-                                block: self.block_stmt_of_for(unknown_pair)?,
+                                block: self.block_stmt_of_loop(unknown_pair)?,
                             }),
                             _ => unreachable!(),
                         }
                     }
                     Rule::for_stmt_afterthought => {
                         let afterthought = Some(self.expr(unknown_pair)?);
-                        let block = self.block_stmt_of_for(for_stmt_inner.next().unwrap())?;
+                        let block = self.block_stmt_of_loop(for_stmt_inner.next().unwrap())?;
                         Ok(ForStmt {
                             init,
                             cond: None,
@@ -240,7 +240,7 @@ impl AstBuilder {
                         init,
                         cond: None,
                         afterthought: None,
-                        block: self.block_stmt_of_for(unknown_pair)?,
+                        block: self.block_stmt_of_loop(unknown_pair)?,
                     }),
                     _ => unreachable!(),
                 }
@@ -251,7 +251,7 @@ impl AstBuilder {
                 match unknown_pair.as_rule() {
                     Rule::for_stmt_afterthought => {
                         let afterthought = Some(self.expr(unknown_pair)?);
-                        let block = self.block_stmt_of_for(for_stmt_inner.next().unwrap())?;
+                        let block = self.block_stmt_of_loop(for_stmt_inner.next().unwrap())?;
                         Ok(ForStmt {
                             init: None,
                             cond,
@@ -263,14 +263,14 @@ impl AstBuilder {
                         init: None,
                         cond,
                         afterthought: None,
-                        block: self.block_stmt_of_for(unknown_pair)?,
+                        block: self.block_stmt_of_loop(unknown_pair)?,
                     }),
                     _ => unreachable!(),
                 }
             }
             Rule::for_stmt_afterthought => {
                 let afterthought = Some(self.expr(unknown_pair)?);
-                let block = self.block_stmt_of_for(for_stmt_inner.next().unwrap())?;
+                let block = self.block_stmt_of_loop(for_stmt_inner.next().unwrap())?;
                 Ok(ForStmt {
                     init: None,
                     cond: None,
@@ -282,7 +282,7 @@ impl AstBuilder {
                 init: None,
                 cond: None,
                 afterthought: None,
-                block: self.block_stmt_of_for(unknown_pair)?,
+                block: self.block_stmt_of_loop(unknown_pair)?,
             }),
             _ => unreachable!(),
         }
@@ -301,7 +301,7 @@ impl AstBuilder {
         }
     }
 
-    fn block_stmt_of_for(&mut self, block_stmt_pair: Pair<Rule>) -> Result<BlockStmt, ParseError> {
+    fn block_stmt_of_loop(&mut self, block_stmt_pair: Pair<Rule>) -> Result<BlockStmt, ParseError> {
         let block_stmt = self.block_stmt(block_stmt_pair)?;
         if let AstBuildFlow::Continue | AstBuildFlow::Break = self.flow {
             self.flow = AstBuildFlow::Value;
@@ -312,7 +312,7 @@ impl AstBuilder {
     fn while_stmt(&mut self, while_stmt_pair: Pair<Rule>) -> Result<WhileStmt, ParseError> {
         let mut while_stmt_inner = while_stmt_pair.into_inner();
         let cond = while_stmt_inner.next().map(|p| self.expr(p)).unwrap()?;
-        let block = while_stmt_inner.next().map(|p| self.block_stmt(p)).unwrap()?;
+        let block = while_stmt_inner.next().map(|p| self.block_stmt_of_loop(p)).unwrap()?;
         Ok(WhileStmt {
             cond,
             block
@@ -1186,7 +1186,40 @@ mod tests {
                         ]
                     })
                 ])
-            ),        ];
+            ),
+            (
+                r#"
+            while (true) {
+                break;
+                continue; // Ignored by parser
+            }
+            "#,
+                Ok(vec![
+                    Stmt::WhileStmt(WhileStmt {
+                        cond: Expr::literal_bool(true),
+                        block: vec![
+                            Stmt::BreakStmt
+                        ]
+                    })
+                ])
+            ),
+            (
+                r#"
+            while (true) {
+                continue;
+                break; // Ignored by parser
+            }
+            "#,
+                Ok(vec![
+                    Stmt::WhileStmt(WhileStmt {
+                        cond: Expr::literal_bool(true),
+                        block: vec![
+                            Stmt::ContinueStmt
+                        ]
+                    })
+                ])
+            ),
+        ];
 
         for (src, expected) in tests {
             assert_eq!(parse(src), expected, "Failed in test case: {}", src);
