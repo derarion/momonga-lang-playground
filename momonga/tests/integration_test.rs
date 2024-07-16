@@ -135,7 +135,7 @@ fn prefix_operator_is_interpreted_correctly() {
             r#"
             -9223372036854775808; // Min value of Integer type
         "#,
-            Some(std::i64::MIN.to_string()),
+            Some(i64::MIN.to_string()),
         ),
         (
             r#"
@@ -153,7 +153,7 @@ fn prefix_operator_is_interpreted_correctly() {
             r#"
             +-9223372036854775808;  // Attempt to apply + operator to the min of Integer type
         "#,
-            Some(std::i64::MIN.to_string()),
+            Some(i64::MIN.to_string()),
         ),
         (
             r#"
@@ -1319,6 +1319,54 @@ fn for_statement_controls_flow_correctly() {
                 }
             }
             i;
+            "#,
+            Some("10".to_string()),
+        ),
+    ];
+
+    for (src, expected) in tests {
+        assert_eq!(interpret(src), expected, "Failed in test case: {}", src);
+    }
+}
+
+#[test]
+fn while_statement_controls_flow_correctly() {
+    let tests = [
+        (
+            r#"
+            var x = 1;
+            while (x < 10) {
+                x = x + 1;
+            }
+            x;
+            "#,
+            Some("10".to_string()),
+        ),
+        (
+            r#"
+            var x = 1;
+            while (x < 10) {
+                x = x + 1;
+                if (x == 3 ) {
+                    break;
+                    x = 100; // Not executed
+                }
+            }
+            x;
+            "#,
+            Some("3".to_string()),
+        ),
+        (
+            r#"
+            var x = 1;
+            while (x < 10) {
+                x = x + 1;
+                if (true) {
+                    continue;
+                    x = 100; // Not executed
+                }
+            }
+            x;
             "#,
             Some("10".to_string()),
         ),

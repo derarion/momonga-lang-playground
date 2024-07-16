@@ -267,12 +267,27 @@ for (var i = 0; i < 100; i = i + 1) {
 Curly braces are always required.
 
 ```JavaScript
-for (var i = 0; i < 100; i = i + 1) ; // Syntax error
+for (;;) ; // Syntax error
 ```
 
-### While Statement
+#### While Statement
 
-:warning: Under Development
+```JavaScript
+while (x < 100) {
+    if (x % 2 == 0 ) {
+        continue;
+    }
+    odd_sum =  odd_sum + x;
+}
+```
+
+`break` statement can also be used in while statement.
+
+Curly braces are always required.
+
+```JavaScript
+while (true) ; // Syntax error
+```
 
 ### Function Declaraion and Call Operator
 

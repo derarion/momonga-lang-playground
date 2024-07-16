@@ -21,7 +21,7 @@ jobs:
           node-version: 18
       - uses: actions-rs/toolchain@v1 # TODO: Not maintained. Consider using an alternative.
         with:
-          toolchain: 1.72
+          toolchain: 1.74
           target: wasm32-unknown-unknown
           override: true
           components: clippy

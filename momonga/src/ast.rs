@@ -10,6 +10,8 @@ pub enum Stmt {
     #[allow(clippy::enum_variant_names)]
     ForStmt(ForStmt),
     #[allow(clippy::enum_variant_names)]
+    WhileStmt(WhileStmt),
+    #[allow(clippy::enum_variant_names)]
     VarStmt(VarStmt),
     #[allow(clippy::enum_variant_names)]
     ExprStmt(ExprStmt),
@@ -55,6 +57,13 @@ pub enum ForStmtInit {
 }
 pub type ForStmtCond = Expr;
 pub type ForStmtAfterthought = Expr;
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct WhileStmt {
+    pub cond: WhileStmtCond,
+    pub block: BlockStmt,
+}
+pub type WhileStmtCond = Expr;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct VarStmt {

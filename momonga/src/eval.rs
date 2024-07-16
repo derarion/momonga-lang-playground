@@ -17,7 +17,7 @@ pub enum JumpStmt<'a> {
     Error(EvalError),
 }
 
-const MAX_ABS_INT: u64 = std::i64::MIN.unsigned_abs(); // TODO: Reconsider how to handle value overflow
+const MAX_ABS_INT: u64 = i64::MIN.unsigned_abs(); // TODO: Reconsider how to handle value overflow
 
 pub fn eval<'a>(
     program: &'a Program,
@@ -31,23 +31,26 @@ pub fn eval<'a>(
 }
 
 fn eval_block_stmt<'a>(block_stmt: &'a BlockStmt, env: Rc<RefCell<Env<'a>>>) -> EvalStmtResult<'a> {
-    let env_block = Rc::new(RefCell::new(Env::new(Some(Rc::clone(&env)))));
     let mut result = Ok(None);
 
     for stmt in block_stmt {
         result = match stmt {
-            Stmt::BlockStmt(block_stmt) => eval_block_stmt(block_stmt, Rc::clone(&env_block)),
-            Stmt::FuncDecl(func_decl) => eval_func_decl(func_decl, Rc::clone(&env_block)),
-            Stmt::IfStmt(if_stmt) => eval_if_stmt(if_stmt, Rc::clone(&env_block)),
-            Stmt::ForStmt(for_stmt) => eval_for_stmt(for_stmt, Rc::clone(&env_block)),
-            Stmt::VarStmt(var_stmt) => eval_var_stmt(var_stmt, Rc::clone(&env_block)),
-            Stmt::ExprStmt(expr_stmt) => eval_expr_stmt(expr_stmt, Rc::clone(&env_block)),
+            Stmt::BlockStmt(block_stmt) => {
+                let env_block = Rc::new(RefCell::new(Env::new(Some(Rc::clone(&env)))));
+                eval_block_stmt(block_stmt, Rc::clone(&env_block))
+            },
+            Stmt::FuncDecl(func_decl) => eval_func_decl(func_decl, Rc::clone(&env)),
+            Stmt::IfStmt(if_stmt) => eval_if_stmt(if_stmt, Rc::clone(&env)),
+            Stmt::ForStmt(for_stmt) => eval_for_stmt(for_stmt, Rc::clone(&env)),
+            Stmt::WhileStmt(while_stmt) => eval_while_stmt(while_stmt, Rc::clone(&env)),
+            Stmt::VarStmt(var_stmt) => eval_var_stmt(var_stmt, Rc::clone(&env)),
+            Stmt::ExprStmt(expr_stmt) => eval_expr_stmt(expr_stmt, Rc::clone(&env)),
             Stmt::ContinueStmt => Err(JumpStmt::Continue),
             Stmt::BreakStmt => Err(JumpStmt::Break),
             Stmt::ReturnStmt(return_stmt) => {
                 let ReturnStmt { expr } = return_stmt;
                 match expr {
-                    Some(expr) => Err(JumpStmt::Return(eval_expr(expr, Rc::clone(&env_block))?)),
+                    Some(expr) => Err(JumpStmt::Return(eval_expr(expr, Rc::clone(&env))?)),
                     None => Err(JumpStmt::Return(Rc::new(RefCell::new(Value::None)))),
                 }
             }
@@ -91,12 +94,14 @@ fn eval_if_stmt<'a>(if_stmt: &'a IfStmt, env: Rc<RefCell<Env<'a>>>) -> EvalStmtR
         else_clause,
     } = if_stmt;
 
+    let env_block = Rc::new(RefCell::new(Env::new(Some(Rc::clone(&env)))));
+
     match *eval_expr(condition, Rc::clone(&env))?.borrow() {
         Value::Bool(bool) => {
             if bool {
-                eval_block_stmt(block, env)
+                eval_block_stmt(block, env_block)
             } else if let Some(if_stmt_else_clause) = else_clause {
-                eval_if_stmt_else_clause(if_stmt_else_clause, env)
+                eval_if_stmt_else_clause(if_stmt_else_clause, env_block)
             } else {
                 Ok(None)
             }
@@ -153,7 +158,8 @@ fn eval_for_stmt<'a>(for_stmt: &'a ForStmt, env: Rc<RefCell<Env<'a>>>) -> EvalSt
                 continue;
             }
             Err(JumpStmt::Break) => {
-                return Ok(None);
+                result = Ok(None);
+                break;
             }
             default => default,
         };
@@ -171,6 +177,37 @@ fn eval_for_stmt_afterthought<'a>(
         eval_expr_stmt(for_stmt_afterthought, Rc::clone(&env))?;
     };
     Ok(None)
+}
+
+fn eval_while_stmt<'a>(while_stmt: &'a WhileStmt, env: Rc<RefCell<Env<'a>>>) -> EvalStmtResult<'a> {
+    let WhileStmt { cond, block } = while_stmt;
+
+    let mut result = Ok(None);
+    let env_block = Rc::new(RefCell::new(Env::new(Some(Rc::clone(&env)))));
+
+    loop {
+        let cond = match *eval_expr(cond, Rc::clone(&env_block))?.borrow() {
+            Value::Bool(bool) => bool,
+            _ => return Err(JumpStmt::Error(EvalError::Type)),
+        };
+
+        if !cond { break; }
+
+        result = match eval_block_stmt(block, Rc::clone(&env_block)) {
+            Err(JumpStmt::Continue) => {
+                result = Ok(None);
+                continue;
+            },
+            Err(JumpStmt::Break) => {
+                result = Ok(None);
+                break;
+            },
+            default => default,
+        }
+    }
+
+    result
+
 }
 
 fn eval_var_stmt<'a>(var_stmt: &'a VarStmt, env: Rc<RefCell<Env<'a>>>) -> EvalStmtResult<'a> {
@@ -213,12 +250,12 @@ fn eval_expr<'a>(expr: &'a Expr, env: Rc<RefCell<Env<'a>>>) -> EvalExprResult<'a
                 PrefixOpKind::Neg => {
                     if let Expr::Literal(Literal::Int(int)) = **rhs {
                         if int == MAX_ABS_INT {
-                            return Ok(Rc::new(RefCell::new(Value::Int(std::i64::MIN))));
+                            return Ok(Rc::new(RefCell::new(Value::Int(i64::MIN))));
                         };
                     };
                     match *eval_expr(rhs, env)?.borrow() {
                         Value::Int(int) => {
-                            if int == std::i64::MIN {
+                            if int == i64::MIN {
                                 return Err(JumpStmt::Error(EvalError::OutOfRange));
                                 // Attempt to nagate i64 min
                             }
@@ -678,6 +715,18 @@ mod tests {
                 Rc::new(RefCell::new(Env::new_with_builtins()))
             ),
             Ok(Some(Rc::new(RefCell::new(Value::Int(9)))))
+        );
+        // WhileStmt
+        assert_eq!(
+            eval(
+                // while(true) {break;}
+                &vec![Stmt::WhileStmt(WhileStmt {
+                    cond: Expr::literal_bool(true),
+                    block: vec![Stmt::BreakStmt]
+                })],
+                Rc::new(RefCell::new(Env::new_with_builtins()))
+            ),
+            Ok(None)
         );
         // VarStmt
         assert_eq!(
