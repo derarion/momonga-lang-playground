@@ -3,7 +3,7 @@
 Welcome to the Momonga playground!  
 Momonga, named after [the Japanese flying squirrel](https://simple.wikipedia.org/wiki/Japanese_dwarf_flying_squirrel), is a programming language designed for complete beginners.
 
-You can try it [here](https://radish19.github.io/momonga-lang-playground/)!
+You can try it [here](https://derarion.github.io/momonga-lang-playground/)!
 
 :warning: Momonga is still Under Development, but you can try some of its features.
 
@@ -95,7 +95,7 @@ Please refer to [Language Overview](#language-overview) section.
 ### No Setup
 
 Most programming languages require setting up an environment to run code, which might reduce learners' motivation.  
-Momonga runs on the [playground](https://radish19.github.io/momonga-lang-playground/), so users need nothing but a web browser.
+Momonga runs on the [playground](https://derarion.github.io/momonga-lang-playground/), so users need nothing but a web browser.
 
 ## Language Overview
 
